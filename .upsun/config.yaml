@@ -1,0 +1,35 @@
+# Upsun configuration, generated using AI at: 2026-10-26T19:12:27.998Z
+# AI can make mistakes. Please modify this file to suit your needs.
+applications:
+  nightscout:
+    type: nodejs:24  # Using latest Node.js version 24 from Registry as per Dockerfile base image
+
+    build:
+      flavor: none
+
+    hooks:
+      build: |
+        set -ex
+        npm ci --omit=dev
+
+    web:
+      commands:
+        start: node lib/server/server.js
+
+      locations:
+        /:
+          root: static
+          passthru: true
+          allow: false
+
+    relationships:
+      mongo: {}  # MongoDB service relationship
+
+services:
+  mongo:
+    type: mongodb:4.0  # MongoDB version 4.0 as indicated by docker-compose.yml
+
+routes:
+  https://{default}/:
+    type: upstream
+    upstream: nightscout:http
